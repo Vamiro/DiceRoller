@@ -10,21 +10,25 @@ namespace Dice
 {
     public class DiceController : MonoBehaviour
     {
+        public bool CanRoll => !_isBusy && !_simulatingDice.TransformRecorder.IsRecording;
+        
         [SerializeField] private Dice _simulatingDice;
         [SerializeField] private Dice _realDice;
-        [SerializeField, Range(1, 15)] private int _speed;
+        [SerializeField] private Transform _startTrnsform;
+        [SerializeField, Range(1, 50)] private int _speed;
         [SerializeField, Range(1, 15)] private int _simulateSpeed;
         [SerializeField, Range(0f, 100f)] private float _throwForce;
         [SerializeField, Range(0f, 15f)] private float _spinForce;
-        
         [SerializeField] private int desiredNum;
+        
+        
         private int _currentNum;
-        private bool _isBussy;
+        private bool _isBusy;
         
         void Start()
         {
-            _realDice.SetSpeed(_speed);
-            _simulatingDice.SetSpeed(1);
+            _realDice.Initialize(_startTrnsform, _speed);
+            _simulatingDice.Initialize(_startTrnsform, 1);
             Time.timeScale = _simulateSpeed;
             
             _simulatingDice.DiceLanded += () =>
@@ -33,32 +37,32 @@ namespace Dice
                 _currentNum = _simulatingDice.Result();
             };
             
-            _realDice.TransformRecorder.DataHasEnded += () => _isBussy = false;
+            _realDice.TransformRecorder.DataHasEnded += () => _isBusy = false;
             
             _simulatingDice.Roll(_throwForce, _spinForce);
             _simulatingDice.TransformRecorder.StartRecord();
         }
-
-        void FixedUpdate()
+        
+        public void PrecalculatedRoll()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && !_isBussy && !_simulatingDice.TransformRecorder.IsRecording)
-            {
-                _isBussy = true;
-                if(_currentNum != desiredNum)
-                {
-                    _realDice.TransformRecorder.RotationShift =
-                        Quaternion.FromToRotation(GetSideVector(desiredNum), GetSideVector(_currentNum));
-                }
-                else
-                {
-                    _realDice.TransformRecorder.RotationShift = Quaternion.identity;
-                }
+             if (CanRoll)
+             {
+                 _isBusy = true;
+                 if(_currentNum != desiredNum)
+                 {
+                     _realDice.TransformRecorder.RotationShift =
+                         Quaternion.FromToRotation(GetSideVector(desiredNum), GetSideVector(_currentNum));
+                 }
+                 else
+                 {
+                     _realDice.TransformRecorder.RotationShift = Quaternion.identity;
+                 }
 
-                _realDice.TransformRecorder.CopyValues(_simulatingDice.TransformRecorder);
-                _simulatingDice.Roll(_throwForce, _spinForce);
-                _simulatingDice.TransformRecorder.StartRecord();
-                _realDice.TransformRecorder.StartReplay();
-            }
+                 _realDice.TransformRecorder.CopyValues(_simulatingDice.TransformRecorder);
+                 _simulatingDice.Roll(_throwForce, _spinForce);
+                 _simulatingDice.TransformRecorder.StartRecord();
+                 _realDice.TransformRecorder.StartReplay();
+             }
         }
         
         private Vector3 GetSideVector(int num)
