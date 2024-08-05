@@ -1,5 +1,7 @@
 ### DiceRoller
 
+https://github.com/user-attachments/assets/565ddeb1-1f09-4abb-b813-467f435a1dc4
+
 #### Основные классы и их функции
 
 1. **Dice**
