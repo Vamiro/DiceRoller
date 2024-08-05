@@ -4,6 +4,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Zenject;
 using Random = System.Random;
 
 namespace Dice
@@ -11,39 +12,42 @@ namespace Dice
     public class DiceController : MonoBehaviour
     {
         public bool CanRoll => !_isBusy && !_simulatingDice.TransformRecorder.IsRecording;
-        
         [SerializeField] private Dice _simulatingDice;
         [SerializeField] private Dice _realDice;
-        [SerializeField] private Transform _startTrnsform;
-        [SerializeField, Range(1, 50)] private int _speed;
-        [SerializeField, Range(1, 15)] private int _simulateSpeed;
-        [SerializeField, Range(0f, 100f)] private float _throwForce;
-        [SerializeField, Range(0f, 15f)] private float _spinForce;
-        [SerializeField] private int desiredNum;
-        
-        
+
+        private int _speed;
+        private float _throwForce;
+        private float _spinForce;
         private int _currentNum;
         private bool _isBusy;
         
+        [Inject]
+        public void Construct(DiceConfig config)
+        {
+            Time.timeScale = config.SimulateSpeed;
+            _speed = config.Speed;
+            _throwForce = config.ThrowForce;
+            _spinForce = config.SpinForce;
+        }
+        
         void Start()
         {
-            _realDice.Initialize(_startTrnsform, _speed);
-            _simulatingDice.Initialize(_startTrnsform, 1);
-            Time.timeScale = _simulateSpeed;
+            _realDice.Initialize(transform, 51 - _speed);
+            _simulatingDice.Initialize(transform, 1);
             
             _simulatingDice.DiceLanded += () =>
             {
-                _simulatingDice.TransformRecorder.StopRecord();
                 _currentNum = _simulatingDice.Result();
+                if (_currentNum == -1) SimulateRoll();
+                else _simulatingDice.TransformRecorder.StopRecord();
             };
             
             _realDice.TransformRecorder.DataHasEnded += () => _isBusy = false;
             
-            _simulatingDice.Roll(_throwForce, _spinForce);
-            _simulatingDice.TransformRecorder.StartRecord();
+            SimulateRoll();
         }
         
-        public void PrecalculatedRoll()
+        public void PrecalculatedRoll(int desiredNum)
         {
              if (CanRoll)
              {
@@ -53,18 +57,23 @@ namespace Dice
                      _realDice.TransformRecorder.RotationShift =
                          Quaternion.FromToRotation(GetSideVector(desiredNum), GetSideVector(_currentNum));
                  }
-                 else
+                 else if(_currentNum == desiredNum)
                  {
                      _realDice.TransformRecorder.RotationShift = Quaternion.identity;
                  }
 
                  _realDice.TransformRecorder.CopyValues(_simulatingDice.TransformRecorder);
-                 _simulatingDice.Roll(_throwForce, _spinForce);
-                 _simulatingDice.TransformRecorder.StartRecord();
+                 SimulateRoll();
                  _realDice.TransformRecorder.StartReplay();
              }
         }
-        
+
+        private void SimulateRoll()
+        {
+            _simulatingDice.Roll(_throwForce, _spinForce);
+            _simulatingDice.TransformRecorder.StartRecord();
+        }
+
         private Vector3 GetSideVector(int num)
         {
             switch (num)

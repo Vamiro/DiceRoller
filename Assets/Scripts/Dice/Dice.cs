@@ -9,14 +9,11 @@ namespace Dice
     {
         private Rigidbody _rb;
         private bool _hasVelocity;
+        private Transform _startTransform;
         private TransformRecorder _transformRecorder;
         public TransformRecorder TransformRecorder => _transformRecorder;
-        
-        public event Action DiceLanded;
 
-        private Transform _startTransform;
-        
-        [SerializeField] public Vector3 PositionShift;
+        public event Action DiceLanded;
 
         private void Awake()
         {
@@ -70,25 +67,25 @@ namespace Dice
             else
             {
                 int layerMask = 1 << cubeLayerIndex;
-                if (Physics.Raycast(transform.position, transform.forward * -1, 1f, layerMask)) return 1;
-                if (Physics.Raycast(transform.position, transform.up * -1, 1f, layerMask)) return 2;
-                if (Physics.Raycast(transform.position, transform.right, 1f, layerMask)) return 3;
-                if (Physics.Raycast(transform.position, transform.right * -1, 1f, layerMask)) return 4;
-                if (Physics.Raycast(transform.position, transform.up, 1f, layerMask)) return 5;
-                if (Physics.Raycast(transform.position, transform.forward, 1f, layerMask)) return 6;
+                if (Physics.Raycast(transform.position, transform.forward * -1, transform.localScale.x, layerMask)) return 1;
+                if (Physics.Raycast(transform.position, transform.up * -1, transform.localScale.x, layerMask)) return 2;
+                if (Physics.Raycast(transform.position, transform.right, transform.localScale.x, layerMask)) return 3;
+                if (Physics.Raycast(transform.position, transform.right * -1, transform.localScale.x, layerMask)) return 4;
+                if (Physics.Raycast(transform.position, transform.up, transform.localScale.x, layerMask)) return 5;
+                if (Physics.Raycast(transform.position, transform.forward, transform.localScale.x, layerMask)) return 6;
             }
-            return 0;
+            return -1;
         }
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position + transform.forward * -1);
-            Gizmos.DrawLine(transform.position, transform.position + transform.up * -1);
-            Gizmos.DrawLine(transform.position, transform.position + transform.right);
-            Gizmos.DrawLine(transform.position, transform.position + transform.right * -1);
-            Gizmos.DrawLine(transform.position, transform.position + transform.up);
-            Gizmos.DrawLine(transform.position, transform.position + transform.forward);
+            Gizmos.DrawLine(transform.position, transform.position + transform.forward * -1 * transform.localScale.x);
+            Gizmos.DrawLine(transform.position, transform.position + transform.up * -1 * transform.localScale.x);
+            Gizmos.DrawLine(transform.position, transform.position + transform.right * transform.localScale.x);
+            Gizmos.DrawLine(transform.position, transform.position + transform.right * -1 * transform.localScale.x);
+            Gizmos.DrawLine(transform.position, transform.position + transform.up * transform.localScale.x);
+            Gizmos.DrawLine(transform.position, transform.position + transform.forward * transform.localScale.x);
         }
     }
 }

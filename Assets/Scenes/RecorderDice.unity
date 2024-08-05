@@ -331,7 +331,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.30070576, y: 0, z: 0, w: 0.953717}
-  m_LocalPosition: {x: -2.425, y: 2.78, z: 18.87}
+  m_LocalPosition: {x: -2.425, y: 2.634, z: 19.078}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -466,7 +466,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 390320973}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 9f3bc74ae5b377b42880aa4634f82eac, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -542,7 +542,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78f773b1665c45d798da678986ea174e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PositionShift: {x: -1, y: 0, z: 0}
 --- !u!1 &459707959
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,12 +621,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _simulatingDice: {fileID: 795893955}
   _realDice: {fileID: 9221492763886718033}
-  _startTrnsform: {fileID: 2029004868}
-  _speed: 30
-  _simulateSpeed: 10
-  _throwForce: 3
-  _spinForce: 0.5
-  desiredNum: 2
 --- !u!4 &483949108
 Transform:
   m_ObjectHideFlags: 0
@@ -636,15 +629,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 483949106}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.530758, y: 9.273808, z: -50.245186}
+  m_LocalRotation: {x: -0.20557553, y: 0.21046355, z: 0.30220678, w: 0.9067055}
+  m_LocalPosition: {x: 0.33500004, y: 6.564, z: 0.32500076}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 795893954}
   - {fileID: 8408926816789452532}
   m_Father: {fileID: 753201783}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -30, y: 17.291, z: 32.201}
 --- !u!4 &574054520 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9051238300485817969, guid: 2f6c4572e07a60b43b00e1c4f489a806,
@@ -983,7 +976,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78f773b1665c45d798da678986ea174e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PositionShift: {x: 1, y: 0, z: 0}
 --- !u!54 &795893956
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1018,7 +1010,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 795893953}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 9f3bc74ae5b377b42880aa4634f82eac, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1617,12 +1609,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _simulatingDice: {fileID: 390320980}
   _realDice: {fileID: 1268070689}
-  _startTrnsform: {fileID: 1401102484}
-  _speed: 30
-  _simulateSpeed: 10
-  _throwForce: 3
-  _spinForce: 0.5
-  desiredNum: 6
 --- !u!4 &1063368939
 Transform:
   m_ObjectHideFlags: 0
@@ -1631,15 +1617,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1063368937}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.530758, y: 9.273808, z: -50.245186}
+  m_LocalRotation: {x: -0.33168373, y: 0.16000965, z: -0.28215975, w: 0.88587177}
+  m_LocalPosition: {x: 0.049000025, y: 6.564, z: 0.46500015}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 390320974}
   - {fileID: 1268070694}
   m_Father: {fileID: 753201783}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -29.826, y: 32.856, z: -44.314}
 --- !u!1 &1125855698
 GameObject:
   m_ObjectHideFlags: 0
@@ -1726,7 +1712,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78f773b1665c45d798da678986ea174e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PositionShift: {x: 0, y: 0, z: 0}
 --- !u!114 &1268070690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2343,6 +2328,7 @@ GameObject:
   - component: {fileID: 2007922255}
   - component: {fileID: 2007922254}
   - component: {fileID: 2007922253}
+  - component: {fileID: 2007922256}
   m_Layer: 0
   m_Name: SceneContext
   m_TagString: Untagged
@@ -2362,7 +2348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75a3ad6c5358691439684bed05e2e206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _recallSpellConfig: {fileID: 11400000, guid: ad433f319e882154f8bfaca338498268, type: 2}
+  _replayConfig: {fileID: 11400000, guid: ad433f319e882154f8bfaca338498268, type: 2}
 --- !u!114 &2007922254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2378,6 +2364,7 @@ MonoBehaviour:
   _scriptableObjectInstallers: []
   _monoInstallers:
   - {fileID: 2007922253}
+  - {fileID: 2007922256}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -2410,6 +2397,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2007922256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007922252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad2dce45dbea4465ba11cf4ebffc457e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _diceConfig: {fileID: 11400000, guid: 0ecc44698b0a2ce48aa04b9ca7e7be0e, type: 2}
 --- !u!1 &2029004867
 GameObject:
   m_ObjectHideFlags: 0
@@ -2736,7 +2736,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78f773b1665c45d798da678986ea174e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PositionShift: {x: 0, y: 0, z: 0}
 --- !u!114 &9221492763886718034
 MonoBehaviour:
   m_ObjectHideFlags: 0
