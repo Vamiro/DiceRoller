@@ -1,37 +1,40 @@
 ﻿using System;
 using Unity.VisualScripting;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace Dice
 {
     [RequireComponent(typeof(TransformRecorder))]
-    public class Dice : MonoBehaviour
+    public class DiceComponent : MonoBehaviour
     {
+        private const int CubeLayerIndex = 7;
+
+        public TransformRecorder TransformRecorder { get; private set; }
+
         private Rigidbody _rb;
         private bool _hasVelocity;
         private Transform _startTransform;
-        private TransformRecorder _transformRecorder;
-        public TransformRecorder TransformRecorder => _transformRecorder;
 
-        public event Action DiceLanded;
+        public event Action OnDiceLanded;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
-            _transformRecorder = GetComponent<TransformRecorder>();
+            TransformRecorder = GetComponent<TransformRecorder>();
         }
 
         public void Initialize(Transform startTransform, int speed)
         {
             _startTransform = startTransform;
-            _transformRecorder.SetNumberOfSkippedFrames(speed);
+            TransformRecorder.SetNumberOfSkippedFrames(speed);
         }
 
         private void FixedUpdate()
         {
             if (_hasVelocity && _rb.velocity.magnitude <= 0.0001f)
             {
-                DiceLanded?.Invoke();
+                OnDiceLanded?.Invoke();
                 _hasVelocity = false;
             }
 
@@ -43,11 +46,11 @@ namespace Dice
 
         public void Roll(float throwForce, float spinForce)
         {
-            if(!_rb.IsUnityNull())
+            if (!_rb.IsUnityNull())
             {
                 _rb.isKinematic = true;
                 _rb.isKinematic = false;
-                
+
                 transform.position = _startTransform.position;
                 transform.rotation = _startTransform.rotation;
 
@@ -58,22 +61,14 @@ namespace Dice
 
         public int Result()
         {
-            int cubeLayerIndex = LayerMask.NameToLayer("Ground");
-
-            if (cubeLayerIndex == -1)
-            {
-                Debug.LogError("Ground layer did not found");
-            }
-            else
-            {
-                int layerMask = 1 << cubeLayerIndex;
-                if (Physics.Raycast(transform.position, transform.forward * -1, transform.localScale.x, layerMask)) return 1;
-                if (Physics.Raycast(transform.position, transform.up * -1, transform.localScale.x, layerMask)) return 2;
-                if (Physics.Raycast(transform.position, transform.right, transform.localScale.x, layerMask)) return 3;
-                if (Physics.Raycast(transform.position, transform.right * -1, transform.localScale.x, layerMask)) return 4;
-                if (Physics.Raycast(transform.position, transform.up, transform.localScale.x, layerMask)) return 5;
-                if (Physics.Raycast(transform.position, transform.forward, transform.localScale.x, layerMask)) return 6;
-            }
+            const int layerMask = 1 << CubeLayerIndex;
+            if (Physics.Raycast(transform.position, transform.forward * -1, transform.localScale.x, layerMask)) return 1;
+            if (Physics.Raycast(transform.position, transform.up * -1, transform.localScale.x, layerMask)) return 2;
+            if (Physics.Raycast(transform.position, transform.right, transform.localScale.x, layerMask)) return 3;
+            if (Physics.Raycast(transform.position, transform.right * -1, transform.localScale.x, layerMask)) return 4;
+            if (Physics.Raycast(transform.position, transform.up, transform.localScale.x, layerMask)) return 5;
+            if (Physics.Raycast(transform.position, transform.forward, transform.localScale.x, layerMask)) return 6;
+            
             return -1;
         }
 

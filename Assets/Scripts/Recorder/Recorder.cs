@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-public abstract class Recorder<RecordableValue> : MonoBehaviour, IRecorder
+public abstract class Recorder<TValue> : MonoBehaviour, IRecorder
 {
     private int _numberOfSkippedFrames = 5;
     private int _recordFramesCounter = 0;
     private int _replayFramesCounter = 0;
 
-    public event Action<RecordableValue> InterpolatedValue;
+    public event Action<TValue> InterpolatedValue;
     public event Action RestoredValue;
     public event Action DataHasEnded;
 
-    private RecordableValue _currentValue;
-    private RecordableValue _targetValue;
+    private TValue _currentValue;
+    private TValue _targetValue;
 
-    private RecordBuffer<RecordableValue> _buffer;
+    private RecordBuffer<TValue> _buffer;
 
     private bool _isRecording;
     public bool IsRecording => _isRecording;
@@ -28,7 +28,7 @@ public abstract class Recorder<RecordableValue> : MonoBehaviour, IRecorder
     {
         float recordsPerSecond = 1 / Time.fixedDeltaTime / replayConfig.NumberOfSkippedFrames;
         int capacity = Mathf.RoundToInt(replayConfig.MaximumSecondsToRecord * recordsPerSecond);
-        _buffer = new RecordBuffer<RecordableValue>(capacity);
+        _buffer = new RecordBuffer<TValue>(capacity);
     }
 
     private void FixedUpdate()
@@ -60,13 +60,13 @@ public abstract class Recorder<RecordableValue> : MonoBehaviour, IRecorder
             }
 
             float progress = _replayFramesCounter / (float)_numberOfSkippedFrames;
-            RestoreValue(_currentValue, _targetValue, progress);
+            RestoreValue(ref _currentValue, ref _targetValue, progress);
         }
     }
 
     private void ReadNewValue()
     {
-        if (_buffer.TryReadNextValue(out RecordableValue currentValue))
+        if (_buffer.TryReadNextValue(out TValue currentValue))
         {
             _currentValue = currentValue;
 
@@ -105,17 +105,17 @@ public abstract class Recorder<RecordableValue> : MonoBehaviour, IRecorder
         _numberOfSkippedFrames = num;
     }
     
-    public void CopyValues(Recorder<RecordableValue> other)
+    public void CopyValues(Recorder<TValue> other)
     {
         _buffer.ResetValues();
-        _buffer.RecordableValues = new List<RecordableValue>(other._buffer.RecordableValues);
+        _buffer.RecordableValues = new List<TValue>(other._buffer.RecordableValues);
     }
     
-    protected abstract void RestoreValue(RecordableValue currentValue, RecordableValue targetValue, float progress);
+    protected abstract void RestoreValue(ref TValue currentValue, ref TValue targetValue, float progress);
     
-    protected virtual void OnInterpolated(RecordableValue value) => InterpolatedValue?.Invoke(value);
+    protected virtual void OnInterpolated(TValue value) => InterpolatedValue?.Invoke(value);
     
-    protected abstract RecordableValue GetRecordValue();
+    protected abstract TValue GetRecordValue();
     
-    protected abstract bool IsDataValuesChanged(RecordableValue recordableValue);
+    protected abstract bool IsDataValuesChanged(TValue recordableValue);
 }

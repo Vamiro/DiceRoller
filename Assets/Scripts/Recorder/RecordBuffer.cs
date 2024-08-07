@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-public class RecordBuffer<RecordableValue>
+public class RecordBuffer<TValue>
 {
-    private List<RecordableValue> _recordableValues;
+    private List<TValue> _recordableValues;
 
-    public List<RecordableValue> RecordableValues
+    public List<TValue> RecordableValues
     {
         get => _recordableValues;
         set => _recordableValues = value;
@@ -19,11 +19,11 @@ public class RecordBuffer<RecordableValue>
             throw new ArgumentOutOfRangeException(nameof(capacity));
 
         _capacity = capacity;
-        _recordableValues = new List<RecordableValue>(capacity);
+        _recordableValues = new List<TValue>(capacity);
     }
     
 
-    public void Write(RecordableValue recordableValue)
+    public void Write(TValue recordableValue)
     {
         if (_capacity <= _recordableValues.Count)
             _recordableValues.RemoveAt(0);
@@ -31,7 +31,7 @@ public class RecordBuffer<RecordableValue>
         _recordableValues.Add(recordableValue);
     }
 
-    public bool TryReadNextValue(out RecordableValue value)
+    public bool TryReadNextValue(out TValue value)
     {
         if (_recordableValues.Count == 0)
         {

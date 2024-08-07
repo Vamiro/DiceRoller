@@ -10,4 +10,5 @@ public interface IRecorder
 
     void StopRecord();
 
-    void StartReplay(); }
+    void StartReplay(); 
+}

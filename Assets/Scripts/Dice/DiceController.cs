@@ -1,24 +1,21 @@
-using System;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
-using Random = System.Random;
 
 namespace Dice
 {
     public class DiceController : MonoBehaviour
     {
-        public bool CanRoll => !_isBusy && !_simulatingDice.TransformRecorder.IsRecording;
-        [SerializeField] private Dice _simulatingDice;
-        [SerializeField] private Dice _realDice;
+        public bool CanRoll => !_isBusy && !simulatingDiceComponent.TransformRecorder.IsRecording;
+        [SerializeField] private DiceComponent simulatingDiceComponent;
+        [SerializeField] private DiceComponent realDiceComponent;
 
         private int _speed;
         private float _throwForce;
         private float _spinForce;
         private int _currentNum;
+        private TransformRecorder _realDiceTransformRecorder;
+        private TransformRecorder _simulatingDiceTransformRecorder;
         private bool _isBusy;
         
         [Inject]
@@ -32,21 +29,27 @@ namespace Dice
         
         void Start()
         {
-            _realDice.Initialize(transform, 51 - _speed);
-            _simulatingDice.Initialize(transform, 1);
+            realDiceComponent.Initialize(transform, 51 - _speed);
+            simulatingDiceComponent.Initialize(transform, 1);
+
+            _realDiceTransformRecorder = realDiceComponent.TransformRecorder;
+            _simulatingDiceTransformRecorder = simulatingDiceComponent.TransformRecorder;
             
-            _simulatingDice.DiceLanded += () =>
-            {
-                _currentNum = _simulatingDice.Result();
-                if (_currentNum == -1) SimulateRoll();
-                else _simulatingDice.TransformRecorder.StopRecord();
-            };
+            simulatingDiceComponent.OnDiceLanded -= OnDiceComponentLanded;
+            simulatingDiceComponent.OnDiceLanded += OnDiceComponentLanded;
             
-            _realDice.TransformRecorder.DataHasEnded += () => _isBusy = false;
+            _realDiceTransformRecorder.DataHasEnded -= OnReplayEnded;
+            _realDiceTransformRecorder.DataHasEnded += OnReplayEnded;
             
             SimulateRoll();
         }
-        
+
+        private void OnDestroy()
+        {
+            _realDiceTransformRecorder.DataHasEnded -= OnReplayEnded;
+            simulatingDiceComponent.OnDiceLanded -= OnDiceComponentLanded;
+        }
+
         public void PrecalculatedRoll(int desiredNum)
         {
              if (CanRoll)
@@ -54,24 +57,36 @@ namespace Dice
                  _isBusy = true;
                  if(_currentNum != desiredNum)
                  {
-                     _realDice.TransformRecorder.RotationShift =
+                     _realDiceTransformRecorder.RotationShift =
                          Quaternion.FromToRotation(GetSideVector(desiredNum), GetSideVector(_currentNum));
                  }
                  else if(_currentNum == desiredNum)
                  {
-                     _realDice.TransformRecorder.RotationShift = Quaternion.identity;
+                     _realDiceTransformRecorder.RotationShift = Quaternion.identity;
                  }
 
-                 _realDice.TransformRecorder.CopyValues(_simulatingDice.TransformRecorder);
+                 _realDiceTransformRecorder.CopyValues(_simulatingDiceTransformRecorder);
                  SimulateRoll();
-                 _realDice.TransformRecorder.StartReplay();
+                 _realDiceTransformRecorder.StartReplay();
              }
+        }
+
+        private void OnDiceComponentLanded()
+        {
+            _currentNum = simulatingDiceComponent.Result();
+            if (_currentNum == -1) SimulateRoll();
+            else _simulatingDiceTransformRecorder.StopRecord();
+        }
+        
+        private void OnReplayEnded()
+        {
+            _isBusy = false;
         }
 
         private void SimulateRoll()
         {
-            _simulatingDice.Roll(_throwForce, _spinForce);
-            _simulatingDice.TransformRecorder.StartRecord();
+            simulatingDiceComponent.Roll(_throwForce, _spinForce);
+            _simulatingDiceTransformRecorder.StartRecord();
         }
 
         private Vector3 GetSideVector(int num)
