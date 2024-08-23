@@ -1,8 +1,8 @@
-### DiceRoller
+# DiceRoller
 
 https://github.com/user-attachments/assets/565ddeb1-1f09-4abb-b813-467f435a1dc4
 
-#### Основные классы и их функции
+## Основные классы и их функции
 
 1. **Dice**
     - **Namespace**: `Dice`
@@ -54,7 +54,7 @@ https://github.com/user-attachments/assets/565ddeb1-1f09-4abb-b813-467f435a1dc4
     - **Параметры**:
         - `MaximumSecondsToRecord`, `NumberOfSkippedFrames`: Параметры для управления длительностью записи и количеством пропускаемых кадров.
 
-### Использование
+## Использование
 
 - Настройте `DiceConfig` и `ReplayConfig` для установки параметров.
 - Используйте `DiceController` для управления индивидуальными бросками кубика, а `DiceManager` — для координации множества бросков.
