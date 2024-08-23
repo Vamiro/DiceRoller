@@ -1,16 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Dice
 {
-    [RequireComponent(typeof(TransformRecorder))]
     public class DiceComponent : MonoBehaviour
     {
         private const int CubeLayerIndex = 7;
-
-        public TransformRecorder TransformRecorder { get; private set; }
+        public static readonly List<Vector3> _diceSides = new()
+        {
+            Vector3.forward,
+            Vector3.up,
+            Vector3.left,
+            Vector3.right,
+            Vector3.down,
+            Vector3.back
+        };
 
         private Rigidbody _rb;
         private bool _hasVelocity;
@@ -21,13 +28,11 @@ namespace Dice
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
-            TransformRecorder = GetComponent<TransformRecorder>();
         }
 
-        public void Initialize(Transform startTransform, int speed)
+        public void Initialize(Transform startTransform)
         {
             _startTransform = startTransform;
-            TransformRecorder.SetNumberOfSkippedFrames(speed);
         }
 
         private void FixedUpdate()
@@ -62,25 +67,25 @@ namespace Dice
         public int Result()
         {
             const int layerMask = 1 << CubeLayerIndex;
-            if (Physics.Raycast(transform.position, transform.forward * -1, transform.localScale.x, layerMask)) return 1;
-            if (Physics.Raycast(transform.position, transform.up * -1, transform.localScale.x, layerMask)) return 2;
-            if (Physics.Raycast(transform.position, transform.right, transform.localScale.x, layerMask)) return 3;
-            if (Physics.Raycast(transform.position, transform.right * -1, transform.localScale.x, layerMask)) return 4;
-            if (Physics.Raycast(transform.position, transform.up, transform.localScale.x, layerMask)) return 5;
-            if (Physics.Raycast(transform.position, transform.forward, transform.localScale.x, layerMask)) return 6;
             
+            for (int i = 0; i < 6; i++)
+            {
+                if (Physics.Raycast(transform.position, transform.TransformVector(_diceSides[i]), 
+                        transform.localScale.x, layerMask))
+                {
+                    return 6 - i;
+                }
+            }
             return -1;
         }
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position + transform.forward * -1 * transform.localScale.x);
-            Gizmos.DrawLine(transform.position, transform.position + transform.up * -1 * transform.localScale.x);
-            Gizmos.DrawLine(transform.position, transform.position + transform.right * transform.localScale.x);
-            Gizmos.DrawLine(transform.position, transform.position + transform.right * -1 * transform.localScale.x);
-            Gizmos.DrawLine(transform.position, transform.position + transform.up * transform.localScale.x);
-            Gizmos.DrawLine(transform.position, transform.position + transform.forward * transform.localScale.x);
+            for (int j = 0; j < 6; j++)
+            {
+                Gizmos.DrawLine(transform.position,transform.position + transform.TransformVector(_diceSides[j]));
+            }
         }
     }
 }

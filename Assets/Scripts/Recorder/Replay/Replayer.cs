@@ -1,12 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-public abstract class Recorder<TValue> : MonoBehaviour, IRecorder
+public abstract class Replayer<TValue> : MonoBehaviour
 {
     private int _numberOfSkippedFrames = 5;
-    private int _recordFramesCounter = 0;
     private int _replayFramesCounter = 0;
 
     public event Action<TValue> InterpolatedValue;
@@ -18,34 +17,20 @@ public abstract class Recorder<TValue> : MonoBehaviour, IRecorder
 
     private RecordBuffer<TValue> _buffer;
 
-    private bool _isRecording;
-    public bool IsRecording => _isRecording;
-    
+    public RecordBuffer<TValue> Buffer => _buffer;
+
     private bool _isReplaying;
 
     [Inject]
-    public void Construct(ReplayConfig replayConfig)
+    public void Construct(RecorderConfig recorderConfig)
     {
-        float recordsPerSecond = 1 / Time.fixedDeltaTime / replayConfig.NumberOfSkippedFrames;
-        int capacity = Mathf.RoundToInt(replayConfig.MaximumSecondsToRecord * recordsPerSecond);
+        float recordsPerSecond = 1 / Time.fixedDeltaTime / recorderConfig.NumberOfSkippedFrames;
+        int capacity = Mathf.RoundToInt(recorderConfig.MaximumSecondsToRecord * recordsPerSecond);
         _buffer = new RecordBuffer<TValue>(capacity);
     }
 
     private void FixedUpdate()
     {
-        if (_isRecording)
-        {
-            if (_recordFramesCounter < _numberOfSkippedFrames)
-            {
-                _recordFramesCounter++;
-            }
-            else
-            {
-                _recordFramesCounter = 0;
-                var recordValue = GetRecordValue();
-                _buffer.Write(recordValue);
-            }
-        }
         if (_isReplaying)
         {
             if (_replayFramesCounter > 0)
@@ -82,21 +67,28 @@ public abstract class Recorder<TValue> : MonoBehaviour, IRecorder
         }
     }
 
-    public virtual void StartRecord()
+    public virtual void StartReplay(RecordBuffer<TValue> other)
     {
         _buffer.ResetValues();
-        _recordFramesCounter = 0;
-        _isRecording = true;
+        _buffer.RecordableValues = new List<TValue>(other.RecordableValues);
+        _replayFramesCounter = 0;
+        _isReplaying = true;
     }
-
-    public virtual void StopRecord()
-    {
-        _isRecording = false;
-    }
-
+    
     public virtual void StartReplay()
     {
+        if (_buffer.RecordableValues.Count == 0) return;
         _replayFramesCounter = 0;
+        _isReplaying = true;
+    }
+    
+    public virtual void StopReplay()
+    {
+        _isReplaying = false;
+    }
+    
+    public virtual void ContinueReplay()
+    {
         _isReplaying = true;
     }
 
@@ -105,17 +97,7 @@ public abstract class Recorder<TValue> : MonoBehaviour, IRecorder
         _numberOfSkippedFrames = num;
     }
     
-    public void CopyValues(Recorder<TValue> other)
-    {
-        _buffer.ResetValues();
-        _buffer.RecordableValues = new List<TValue>(other._buffer.RecordableValues);
-    }
-    
     protected abstract void RestoreValue(ref TValue currentValue, ref TValue targetValue, float progress);
     
     protected virtual void OnInterpolated(TValue value) => InterpolatedValue?.Invoke(value);
-    
-    protected abstract TValue GetRecordValue();
-    
-    protected abstract bool IsDataValuesChanged(TValue recordableValue);
 }

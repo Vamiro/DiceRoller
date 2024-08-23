@@ -2,7 +2,7 @@
 using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "ReplayConfig", menuName = "Record/ReplayConfig")]
-public class ReplayConfig : ScriptableObject
+public class RecorderConfig : ScriptableObject
 {
     [SerializeField, Range(0, 10)] private float _maximumSecondsToRecord;
     [SerializeField, Range(1, 10)] private float _numberOfSkippedFrames;

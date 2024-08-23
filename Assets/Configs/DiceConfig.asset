@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59bf066484fd44af8966ec08f9115eaa, type: 3}
   m_Name: DiceConfig
   m_EditorClassIdentifier: 
-  _speed: 20
+  _speed: 35
   _simulateSpeed: 10
-  _throwForce: 3
-  _spinForce: 4
+  _throwForce: 3.33
+  _spinForce: 6
   _numberOfSides: 6
   _numberOfDices: 2
-  _desiredNum: 8
+  _desiredNum: 12

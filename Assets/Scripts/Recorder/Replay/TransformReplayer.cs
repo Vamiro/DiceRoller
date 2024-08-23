@@ -1,20 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-public class TransformRecorder : Recorder<TransformValues>
+public class TransformReplayer : Replayer<TransformValues>
 {
     private Quaternion _rotationShift;
-
     public Quaternion RotationShift
     {
         get => _rotationShift;
         set => _rotationShift = value;
     }
-
-    protected override TransformValues GetRecordValue()
-        => new TransformValues(transform.position, transform.rotation);
-
-    protected override bool IsDataValuesChanged(TransformValues lastValue) 
-        => lastValue.Position != transform.position || lastValue.Rotation != transform.rotation;
 
     protected override void RestoreValue(ref TransformValues currentValue, ref TransformValues targetValue, float progress)
     {

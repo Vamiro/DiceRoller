@@ -1,21 +1,23 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 namespace Dice
 {
     public class DiceController : MonoBehaviour
     {
-        public bool CanRoll => !_isBusy && !simulatingDiceComponent.TransformRecorder.IsRecording;
+        public bool CanRoll => !_isBusy && !_simulatingDiceRecorder.IsRecording;
+        
         [SerializeField] private DiceComponent simulatingDiceComponent;
+        [SerializeField] private TransformRecorder _simulatingDiceRecorder;
+        
         [SerializeField] private DiceComponent realDiceComponent;
+        [SerializeField] private TransformReplayer _realDiceReplayer;
 
         private int _speed;
+        private int _maxSpeed;
         private float _throwForce;
         private float _spinForce;
         private int _currentNum;
-        private TransformRecorder _realDiceTransformRecorder;
-        private TransformRecorder _simulatingDiceTransformRecorder;
         private bool _isBusy;
         
         [Inject]
@@ -29,24 +31,24 @@ namespace Dice
         
         void Start()
         {
-            realDiceComponent.Initialize(transform, 51 - _speed);
-            simulatingDiceComponent.Initialize(transform, 1);
-
-            _realDiceTransformRecorder = realDiceComponent.TransformRecorder;
-            _simulatingDiceTransformRecorder = simulatingDiceComponent.TransformRecorder;
+            realDiceComponent.Initialize(transform);
+            simulatingDiceComponent.Initialize(transform);
+            
+            //_simulatingDiceRecorder.SetNumberOfSkippedFrames(1);
+            _realDiceReplayer.SetNumberOfSkippedFrames(_speed);
             
             simulatingDiceComponent.OnDiceLanded -= OnDiceComponentLanded;
             simulatingDiceComponent.OnDiceLanded += OnDiceComponentLanded;
             
-            _realDiceTransformRecorder.DataHasEnded -= OnReplayEnded;
-            _realDiceTransformRecorder.DataHasEnded += OnReplayEnded;
+            _realDiceReplayer.DataHasEnded -= OnReplayEnded;
+            _realDiceReplayer.DataHasEnded += OnReplayEnded;
             
             SimulateRoll();
         }
 
         private void OnDestroy()
         {
-            _realDiceTransformRecorder.DataHasEnded -= OnReplayEnded;
+            _realDiceReplayer.DataHasEnded -= OnReplayEnded;
             simulatingDiceComponent.OnDiceLanded -= OnDiceComponentLanded;
         }
 
@@ -57,17 +59,16 @@ namespace Dice
                  _isBusy = true;
                  if(_currentNum != desiredNum)
                  {
-                     _realDiceTransformRecorder.RotationShift =
-                         Quaternion.FromToRotation(GetSideVector(desiredNum), GetSideVector(_currentNum));
+                     _realDiceReplayer.RotationShift =
+                         Quaternion.FromToRotation(DiceComponent._diceSides[desiredNum - 1], DiceComponent._diceSides[_currentNum - 1]);
                  }
                  else if(_currentNum == desiredNum)
                  {
-                     _realDiceTransformRecorder.RotationShift = Quaternion.identity;
+                     _realDiceReplayer.RotationShift = Quaternion.identity;
                  }
 
-                 _realDiceTransformRecorder.CopyValues(_simulatingDiceTransformRecorder);
+                 _realDiceReplayer.StartReplay(_simulatingDiceRecorder.Buffer);
                  SimulateRoll();
-                 _realDiceTransformRecorder.StartReplay();
              }
         }
 
@@ -75,7 +76,7 @@ namespace Dice
         {
             _currentNum = simulatingDiceComponent.Result();
             if (_currentNum == -1) SimulateRoll();
-            else _simulatingDiceTransformRecorder.StopRecord();
+            else _simulatingDiceRecorder.StopRecord();
         }
         
         private void OnReplayEnded()
@@ -86,21 +87,7 @@ namespace Dice
         private void SimulateRoll()
         {
             simulatingDiceComponent.Roll(_throwForce, _spinForce);
-            _simulatingDiceTransformRecorder.StartRecord();
-        }
-
-        private Vector3 GetSideVector(int num)
-        {
-            switch (num)
-            {
-                case 1: return Vector3.forward;
-                case 2: return Vector3.up;
-                case 3: return Vector3.left;
-                case 4: return Vector3.right;
-                case 5: return Vector3.down;
-                case 6: return Vector3.back;
-                default: return Vector3.zero;
-            }
+            _simulatingDiceRecorder.StartRecord();
         }
     }
 }

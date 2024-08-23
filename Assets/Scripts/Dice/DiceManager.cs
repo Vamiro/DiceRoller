@@ -36,8 +36,8 @@ namespace Dice
             int x = 6;
             int y = 2;
             int num = _desiredNum > x ? 
-                _desiredNum < x * y ? UnityEngine.Random.Range(_desiredNum % x, x + 1) : x
-                : UnityEngine.Random.Range(1, _desiredNum);
+                _desiredNum < x * y ? Random.Range(_desiredNum % x, x + 1) : x
+                : Random.Range(1, _desiredNum);
             return num;
         }
     }

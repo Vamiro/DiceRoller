@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using Dice;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Installers
 {
     public class DiceInstaller : MonoInstaller
     {
-        [SerializeField] private ReplayConfig _replayConfig;
+        [SerializeField] private RecorderConfig recorderConfig;
         [SerializeField] private DiceConfig _diceConfig;
         [SerializeField] private List<DiceController> _diceControllers;
         
@@ -25,7 +26,7 @@ namespace Installers
         
         private void BindReplay()
         {
-            Container.Bind<ReplayConfig>().FromInstance(_replayConfig).AsSingle();
+            Container.Bind<RecorderConfig>().FromInstance(recorderConfig).AsSingle();
         }
     }
 }

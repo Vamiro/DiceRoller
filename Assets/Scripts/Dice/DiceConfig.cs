@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Dice
 {
@@ -7,6 +6,7 @@ namespace Dice
     public class DiceConfig : ScriptableObject
     {
         [SerializeField, Range(0, 50)] private int _speed;
+        private const int _maxSpeed = 50;
         [SerializeField, Range(1, 15)] private int _simulateSpeed;
         [SerializeField, Range(0f, 50f)] private float _throwForce;
         [SerializeField, Range(0f, 50f)] private float _spinForce;
@@ -14,7 +14,7 @@ namespace Dice
         [SerializeField] private int _numberOfDices;
         [SerializeField, Range(2, 12)] private int _desiredNum;
 
-        public int Speed => _speed;
+        public int Speed => _maxSpeed - _speed;
         public int SimulateSpeed => _simulateSpeed;
         public float ThrowForce => _throwForce;
         public float SpinForce => _spinForce;
